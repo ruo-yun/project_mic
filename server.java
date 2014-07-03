@@ -124,9 +124,9 @@ class Server implements ActionListener{
 		jpanel.add(b[3]).setBounds(100,200,100,50);
 		jpanel.add(b[4]).setBounds(100,250,100,50);
 		jpanel.add(b[5]).setBounds(100,300,100,50);
-		b[3].setVisible(false);
-		b[4].setVisible(false);
-		b[5].setVisible(false);
+		//b[3].setVisible(false);
+		//b[4].setVisible(false);
+		//b[5].setVisible(false);
 		b[0].addActionListener(this);
 		b[1].addActionListener(this);
 		b[2].addActionListener(this);
@@ -167,7 +167,12 @@ class Server implements ActionListener{
 			int response =JOptionPane.showOptionDialog(null, "   Do you allow the user to talk ?", "Confirm",
 					JOptionPane.YES_NO_OPTION,JOptionPane.PLAIN_MESSAGE,null, options, options[0]);
 			if (response == JOptionPane.NO_OPTION) {
-					b[3].setText("");
+				if(s==b[3]){
+					b[3].setVisible(false);}
+				else if(s==b[4]){
+					b[4].setVisible(false);}
+				else if(s==b[5]){
+					b[5].setVisible(false);}
 			    	}		
 		}
 	
