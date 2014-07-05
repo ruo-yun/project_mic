@@ -40,7 +40,6 @@ public class MainActivity extends Activity {
     int bufferSizeInShorts;
     int shortsRead;
     short audioBuffer[];
-    byte[] sendStr = new byte[15];
    
     
     @Override
@@ -52,25 +51,12 @@ public class MainActivity extends Activity {
         stopButton = (Button) findViewById(R.id.stop_button);
         talkButton = (Button) findViewById(R.id.talk_button);
         name = (EditText) findViewById(R.id.editText);
-             
+        System.out.println("start");   
         
         talkButton.setOnClickListener(new View.OnClickListener() {//talk
             public void onClick(View v) {
-            	try{
-            	
-            	String sendname =name.getText().toString();
-            	sendStr = sendname.getBytes();
-            	
-            	DatagramSocket clientSocket = new DatagramSocket();
-            	final InetAddress destination = InetAddress.getByName("192.168.0.3");
-				DatagramPacket sendPacket =new DatagramPacket(sendStr, sendStr.length, destination,55000);
-				clientSocket.send(sendPacket);
-	
-            	
-            	}catch (Exception e) {}
-
+            	getusername();
             }
-
         });
 
         
@@ -150,6 +136,35 @@ public class MainActivity extends Activity {
         });
         streamThread.start();
     }
+    public void getusername() {
+    	 Thread nameThread = new Thread(new Runnable() {
 
+             @Override
+             public void run() {
+                 try {
+                	 DatagramSocket clientSocket = new DatagramSocket();
+                	 
+                	 byte[] sendStr = new byte[15];
+                	 String sendname =name.getText().toString();
+                	 sendStr = sendname.getBytes();
+                	 
+                	 
+                	 final InetAddress destination = InetAddress.getByName("192.168.0.3");
+                	 DatagramPacket sendPacket =new DatagramPacket(sendStr, sendStr.length, destination,55000);
+                	 clientSocket.send(sendPacket);
+                	
+                    
+                 
+                 } catch (IOException e) {
+                     e.printStackTrace();
+                     Log.e("VS", "IOException");
+                 }
+             }
 
-}
+         });
+         	nameThread.start();
+     }
+    
+    	
+    }
+
