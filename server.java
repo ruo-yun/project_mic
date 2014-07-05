@@ -30,9 +30,10 @@ class Server implements ActionListener{
 	static boolean status = true;
 	//static int port = 50000;
 	static int sampleRate = 8000;
-	JButton [] b = new JButton[6];
-	JPanel jpanel;
-	JLabel jl,jl2;
+	static JButton [] b = new JButton[6];
+	static JPanel jpanel;
+	static JLabel jl,jl2;
+	static JFrame jf;
 	static byte[] username=new byte[15];
 	static int user_c=0;//user number
 	static String name;
@@ -40,16 +41,22 @@ class Server implements ActionListener{
 	
 	public static void main(String args[]) throws Exception {
 		
+		
 		new Server();
 
 		DatagramSocket servervo = new DatagramSocket(50000);//voice stream
 		
 		DatagramSocket clientname = new DatagramSocket(55000);//username from client
-		
 		DatagramPacket getname = new DatagramPacket(username,username.length);//get username from client
-		clientname.receive(getname); //error
+		clientname.receive(getname); 
 		name = new String(getname.getData());
-		System.out.println(name);
+		//System.out.println(name);
+		if(name!=null){
+			b[3].setVisible(true);
+			b[3].setText(name);
+		}
+		
+		
 		
 		/**for lag = (byte_size/sample_rate)*2 Byte size 9728 will
 		 * produce ~ 0.45 seconds of lag. Voice slightly broken. Byte size 1400
@@ -69,7 +76,7 @@ class Server implements ActionListener{
 			ais = new AudioInputStream(baiss, format, receivePacket.getLength());
 			toSpeaker(receivePacket.getData());
 
-		}
+		} 
 	}
 
 	public static void toSpeaker(byte soundbytes[]) {
@@ -91,12 +98,13 @@ class Server implements ActionListener{
 
 			sourceDataLine.start();
 
-			 System.out.println("format? :" + sourceDataLine.getFormat());
+			System.out.println("format? :" + sourceDataLine.getFormat());
 
-			 sourceDataLine.write(soundbytes, 0, soundbytes.length);
-			 System.out.println(soundbytes.toString());
+			sourceDataLine.write(soundbytes, 0, soundbytes.length);
+			System.out.println(soundbytes.toString());
 			sourceDataLine.drain();
 			sourceDataLine.close();
+			
 		} catch (Exception e) {
 			System.out.println("Not working in speakers...");
 			e.printStackTrace();
@@ -124,9 +132,9 @@ class Server implements ActionListener{
 		jpanel.add(b[3]).setBounds(100,200,100,50);
 		jpanel.add(b[4]).setBounds(100,250,100,50);
 		jpanel.add(b[5]).setBounds(100,300,100,50);
-		//b[3].setVisible(false);
-		//b[4].setVisible(false);
-		//b[5].setVisible(false);
+		b[3].setVisible(false);
+		b[4].setVisible(false);
+		b[5].setVisible(false);
 		b[0].addActionListener(this);
 		b[1].addActionListener(this);
 		b[2].addActionListener(this);
@@ -136,17 +144,13 @@ class Server implements ActionListener{
 		jf.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		jf.setSize(500,700);	
 		jf.setTitle("mic_server");
-		jf.setVisible(true);		
+		jf.setVisible(true);
+		
 	}	
 	public void actionPerformed(ActionEvent e){
 		 
 		JButton s = (JButton)e.getSource();
 		JButton [] list = new JButton[10];
-		/*if(username!=null){
-			b[3].setVisible(true);
-			b[3].setText(name+"");
-			
-		}*/
 		
 		if(s==b[1]){//clean
 			b[3].setVisible(false);
