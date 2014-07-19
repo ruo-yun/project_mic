@@ -26,7 +26,6 @@ public class MainActivity extends Activity {
     private EditText name;
     public byte[] buffer;
     public static DatagramSocket socket;
-    //private int port = 50000;
     AudioRecord recorder;
 
     private int sampleRate = 8000;
@@ -35,6 +34,8 @@ public class MainActivity extends Activity {
     private int audioFormat = AudioFormat.ENCODING_PCM_16BIT;
     int minBufSize = AudioRecord.getMinBufferSize(sampleRate, channelConfig, audioFormat);
     private boolean status = true;
+    static String t="no";
+    static byte[] t_vo=new byte[15];
 
     int bufferSizeInBytes;
     int bufferSizeInShorts;
@@ -55,7 +56,7 @@ public class MainActivity extends Activity {
         
         talkButton.setOnClickListener(new View.OnClickListener() {//talk
             public void onClick(View v) {
-            	getusername();
+            	sendusername();
             }
         });
 
@@ -74,6 +75,7 @@ public class MainActivity extends Activity {
                 status = false;
                 recorder.release();
                 Log.d("VS", "Recorder released");
+                t="no";
 
             }
 
@@ -90,9 +92,13 @@ public class MainActivity extends Activity {
 
             @Override
             public void run() {
+            	
                 try {
 
                     DatagramSocket socket = new DatagramSocket();
+                    
+                    DatagramSocket turn = new DatagramSocket(56000); //receice server allow window turn
+                    
                     Log.d("VS", "Socket Created");
 
                     byte[] buffer = new byte[minBufSize];
@@ -101,7 +107,7 @@ public class MainActivity extends Activity {
                     DatagramPacket packet;
                     //machine's IP
                     final InetAddress destination = InetAddress
-                            .getByName("192.168.0.3");//163.21.245.164 //10.1.12.164
+                            .getByName("192.168.0.3");//163.21.245.164 //10.1.12.181//192.168.0.3
                     Log.d("VS", "Address retrieved");
 
                     recorder = new AudioRecord(MediaRecorder.AudioSource.VOICE_RECOGNITION,
@@ -110,8 +116,20 @@ public class MainActivity extends Activity {
                     Log.d("VS", "Recorder initialized");
 
                     recorder.startRecording();
+                    
+                   
+                    
+                    DatagramPacket getturn = new DatagramPacket(t_vo,t_vo.length);//get username from client
+                    Log.d("VS", "allow = "+t); 
+            		turn.receive(getturn); //error no get turn
+            		
+            		Log.d("VS", "allow = "+t); 
+            		t = new String(getturn.getData());
+            		
+            		
+            		
 
-                    while (status == true) {
+                    while (status == true && t.equals("yes")) { //when accept server allow window
 
                         // reading data from MIC into buffer
                         minBufSize = recorder.read(buffer, 0, buffer.length);
@@ -136,23 +154,27 @@ public class MainActivity extends Activity {
         });
         streamThread.start();
     }
-    public void getusername() {
+    public void sendusername() {
     	 Thread nameThread = new Thread(new Runnable() {
 
              @Override
              public void run() {
+            	
                  try {
-                	 DatagramSocket clientSocket = new DatagramSocket();
                 	 
-                	 byte[] sendStr = new byte[15];
-                	 String sendname =name.getText().toString();
-                	 sendStr = sendname.getBytes();
+                		 DatagramSocket clientSocket = new DatagramSocket();
+                	 
+                		 byte[] sendStr = new byte[15];
+                		 String sendname =name.getText().toString();
+                		 sendStr = sendname.getBytes();
                 	 
                 	 
-                	 final InetAddress destination = InetAddress.getByName("192.168.0.3");
-                	 DatagramPacket sendPacket =new DatagramPacket(sendStr, sendStr.length, destination,55000);
-                	 clientSocket.send(sendPacket);
-                	
+                		 final InetAddress destination = InetAddress.getByName("192.168.0.3");//192.168.0.3
+                		
+                			 DatagramPacket sendPacket =new DatagramPacket(sendStr, sendStr.length, destination,55000);
+                			 clientSocket.send(sendPacket);
+                			 
+                		 
                     
                  
                  } catch (IOException e) {
