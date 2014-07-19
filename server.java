@@ -7,6 +7,7 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
@@ -28,14 +29,12 @@ class Server implements ActionListener{
 	static AudioInputStream ais;
 	static AudioFormat format;
 	static boolean status = true;
-	//static int port = 50000;
 	static int sampleRate = 8000;
 	static JButton [] b = new JButton[6];
 	static JPanel jpanel;
 	static JLabel jl,jl2;
 	static JFrame jf;
 	static byte[] username=new byte[15];
-	static int user_c=0;//user number
 	static String name;
 	
 	
@@ -47,16 +46,16 @@ class Server implements ActionListener{
 		DatagramSocket servervo = new DatagramSocket(50000);//voice stream
 		
 		DatagramSocket clientname = new DatagramSocket(55000);//username from client
+		
 		DatagramPacket getname = new DatagramPacket(username,username.length);//get username from client
+		//should input name , you can talk 
 		clientname.receive(getname); 
+		
 		name = new String(getname.getData());
-		//System.out.println(name);
 		if(name!=null){
 			b[3].setVisible(true);
 			b[3].setText(name);
 		}
-		
-		
 		
 		/**for lag = (byte_size/sample_rate)*2 Byte size 9728 will
 		 * produce ~ 0.45 seconds of lag. Voice slightly broken. Byte size 1400
@@ -68,7 +67,7 @@ class Server implements ActionListener{
 		byte[] receiveData = new byte[5000];
 		format = new AudioFormat(sampleRate, 16, 1, true, false);
 
-		while (status == true) {
+		while (status == true ) {
 			DatagramPacket receivePacket = new DatagramPacket(receiveData,receiveData.length);
 			servervo.receive(receivePacket);
 			ByteArrayInputStream baiss = new ByteArrayInputStream(
@@ -178,7 +177,42 @@ class Server implements ActionListener{
 				else if(s==b[5]){
 					b[5].setVisible(false);}
 			    	}		
+			if (response == JOptionPane.YES_OPTION) {			
+				jl2.setText(name);
+				allow_talk();
+				b[3].setVisible(false);
+				name=null;
+				//send broadcast to client note it can talk
+			}
 		}
+		
 	
 	}	
-}
+	
+	public void allow_talk() {//send to client
+		
+   	 	
+                try {
+                	DatagramSocket allow_client = new DatagramSocket();//allow window to client can send voice
+               	 
+               	 	byte[] allow = new byte[15];
+               	 	String allow_flag=new String("yes");
+               	 	allow= allow_flag.getBytes();
+               	 
+               	 	final InetAddress destination = InetAddress.getByName("192.168.0.3");//192.168.0.3
+               	 	DatagramPacket sendturn =new DatagramPacket(allow, allow.length, destination,56000);
+               	 	allow_client.send(sendturn);
+               	  
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    
+                }
+            }
+      
+    }
+           
+  
+        
+    
+   
+   	
