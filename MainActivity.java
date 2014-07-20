@@ -97,7 +97,7 @@ public class MainActivity extends Activity {
 
                     DatagramSocket socket = new DatagramSocket();
                     
-                    DatagramSocket turn = new DatagramSocket(56000); //receice server allow window turn
+                    //DatagramSocket turn = new DatagramSocket(54000); //receice server allow window turn
                     
                     Log.d("VS", "Socket Created");
 
@@ -114,21 +114,22 @@ public class MainActivity extends Activity {
                             sampleRate, channelConfig, audioFormat,
                             minBufSize * 10);
                     Log.d("VS", "Recorder initialized");
-
+                                                  
                     recorder.startRecording();
                     
-                   
+                    receiceturn();
                     
-                    DatagramPacket getturn = new DatagramPacket(t_vo,t_vo.length);//get username from client
-                    Log.d("VS", "allow = "+t); 
+                    /*DatagramPacket getturn = new DatagramPacket(t_vo,t_vo.length);//get allow from server
+                    Log.d("VS", "allow = "+t); //no can explore
             		turn.receive(getturn); //error no get turn
-            		
-            		Log.d("VS", "allow = "+t); 
             		t = new String(getturn.getData());
+            		Log.d("VS", "allow = "+t); //no get yes
+            		*/
+            		if(t.equals("yes")){
+            			//broadcast
+            		}
             		
             		
-            		
-
                     while (status == true && t.equals("yes")) { //when accept server allow window
 
                         // reading data from MIC into buffer
@@ -171,8 +172,8 @@ public class MainActivity extends Activity {
                 	 
                 		 final InetAddress destination = InetAddress.getByName("192.168.0.3");//192.168.0.3
                 		
-                			 DatagramPacket sendPacket =new DatagramPacket(sendStr, sendStr.length, destination,55000);
-                			 clientSocket.send(sendPacket);
+                		 DatagramPacket sendPacket =new DatagramPacket(sendStr, sendStr.length, destination,55000);
+                		 clientSocket.send(sendPacket);
                 			 
                 		 
                     
@@ -187,6 +188,21 @@ public class MainActivity extends Activity {
          	nameThread.start();
      }
     
-    	
-    }
+    public void receiceturn() {
+    	try{
+    		DatagramSocket turn = new DatagramSocket(54000); //receice server allow window turn
+    		DatagramPacket getturn = new DatagramPacket(t_vo,t_vo.length);//get allow from server
+    		Log.d("VS", "allow = "+t); //no can explore
+    		turn.receive(getturn); //error no get turn
+    		t = new String(getturn.getData());
+    		Log.d("VS", "allow = "+t); //no get yes
+    	}catch (IOException e) {
+            e.printStackTrace();
+            Log.e("VS", "IOException");
+        }
+	
+    }   
+    
+    
+  }
 
