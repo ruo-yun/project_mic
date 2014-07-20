@@ -193,15 +193,15 @@ class Server implements ActionListener{
 		
    	 	
                 try {
-                	DatagramSocket allow_client = new DatagramSocket();//allow window to client can send voice
+                	DatagramSocket allow= new DatagramSocket();//allow window to client can send voice
                	 
-               	 	byte[] allow = new byte[15];
-               	 	String allow_flag=new String("yes");
-               	 	allow= allow_flag.getBytes();
-               	 
+               	 	byte[] turn = new byte[15];
+               	 	String flag=new String("yes");        
+               	 	turn= flag.getBytes();
+               	 	
                	 	final InetAddress destination = InetAddress.getByName("192.168.0.3");//192.168.0.3
-               	 	DatagramPacket sendturn =new DatagramPacket(allow, allow.length, destination,56000);
-               	 	allow_client.send(sendturn);
+               	 	DatagramPacket sendturn =new DatagramPacket(turn, turn.length, destination,54000);
+               	 	allow.send(sendturn);
                	  
                 } catch (IOException e) {
                     e.printStackTrace();
